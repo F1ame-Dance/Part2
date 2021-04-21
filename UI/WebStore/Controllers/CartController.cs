@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebStore.Domain.DTO;
 using WebStore.Infrastructure.Interfaces;
 using WebStore.ViewModels;
@@ -61,6 +61,7 @@ namespace WebStore.Controllers
                 Order = OrderModel,
                 Items = _CartServices.GetViewModel().Items.Select(item => new OrderItemDTO
                 {
+                    Id = item.Product.Id,
                     Price = item.Product.Price,
                     Quantity = item.Quantity,
                 }).ToList()

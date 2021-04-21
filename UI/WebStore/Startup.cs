@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WebStore.Clients.Employees;
+using WebStore.Clients.Identity;
 using WebStore.Clients.Orders;
 using WebStore.Clients.Products;
 using WebStore.Clients.Values;
@@ -29,33 +30,13 @@ namespace WebStore
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            var connection_strng_name = Configuration["ConnectionString"];
-            //services.AddDbContext<WebStoreDB>(opt => opt.UseSqlite(Configuration.GetConnectionString("Sqlite")));
-
-            switch (connection_strng_name)
-            {
-                default: throw new InvalidOperationException($"Подключение {connection_strng_name} не поддерживается");
-                case "SqlServer":
-                    services.AddDbContext<WebStoreDB>(opt =>
-                        opt.UseSqlServer(Configuration.GetConnectionString(connection_strng_name))
-                           .UseLazyLoadingProxies()
-                    );
-                    break;
-                case "Sqlite":
-                    services.AddDbContext<WebStoreDB>(opt =>
-                        opt.UseSqlite(Configuration.GetConnectionString(connection_strng_name), o => o.MigrationsAssembly("WebStore.DAL.Sqlite")));
-                    break;
-            }
-
-            services.AddDbContext<WebStoreDB>(opt => 
-                opt.UseSqlServer(Configuration.GetConnectionString(connection_strng_name))
-                   .UseLazyLoadingProxies()
-                );
-            services.AddTransient<WebStoreDbInitializer>();
-
-            services.AddIdentity<User, Role>(/*opt => { }*/)
-               .AddEntityFrameworkStores<WebStoreDB>()
+          
+         
+            services.AddIdentity<User, Role>()
+               .AddIdentityWebStoreWebAPIClients()
                .AddDefaultTokenProviders();
+
+
 
             services.Configure<IdentityOptions>(opt =>
             {
@@ -89,21 +70,19 @@ namespace WebStore
             });
 
             services.AddTransient<IEmployeesData, EmployeesClient>();
-            //services.AddTransient<IProductData, InMemoryProductData>();
-            services.AddTransient<IProductData, ProductsClient>();
-            services.AddTransient<ICartService, InCookiesCartService>();
-            services.AddTransient<IOrderService, OrdersClient>();
-            services.AddTransient<IValuesService, ValuesClient>();
+            services.AddScoped<IProductData, ProductsClient>();
+            //services.AddScoped<ICartServices, InCookiesCartService>();
+            services.AddScoped<IOrderService, OrdersClient>();
+            services.AddScoped<IValuesService, ValuesClient>();
 
             services
                .AddControllersWithViews()
                .AddRazorRuntimeCompilation();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, WebStoreDbInitializer db)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            db.Initialize();
-
+       
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
