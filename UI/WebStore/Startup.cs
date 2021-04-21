@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
+using WebStore.Clients.Values;
 using WebStore.DAL.Context;
 using WebStore.Data;
 using WebStore.Domain.Entities.Identity;
@@ -17,6 +17,7 @@ using WebStore.Infrastructure.Middleware;
 using WebStore.Infrastructure.Services.InCookies;
 using WebStore.Infrastructure.Services.InMemory;
 using WebStore.Infrastructure.Services.InSQL;
+using WebStore.Interfaces.TestAPI;
 
 namespace WebStore
 {
@@ -88,6 +89,7 @@ namespace WebStore
             services.AddTransient<IProductData, SqlProductData>();
             services.AddTransient<ICartService, InCookiesCartService>();
             services.AddTransient<IOrderService, SqlOrderService>();
+            services.AddTransient<IValuesService, ValuesClient>();
 
             services
                .AddControllersWithViews()
