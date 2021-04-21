@@ -18,7 +18,7 @@ namespace WebStore.Controllers
             var filter = new ProductFilter
             {
                 BrandId = BrandId,
-                SectionId = SectionId
+                SectionId = SectionId,
             };
 
             var products = _ProductData.GetProducts(filter);
@@ -27,15 +27,19 @@ namespace WebStore.Controllers
             {
                 SectionId = SectionId,
                 BrandId = BrandId,
-                Products = products.OrderBy(p => p.Order).ToView()
+                Products = products
+                   .OrderBy(p => p.Order)
+                   .FromDTO()
+                   .ToView()
             });
         }
 
         public IActionResult Details(int id)
         {
             var product = _ProductData.GetProductById(id);
+            if (product is null) return NotFound();
 
-            return View(product.ToView());
+            return View(product.FromDTO().ToView());
         }
     }
 }

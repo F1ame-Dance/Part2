@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using WebStore.Clients.Employees;
+using WebStore.Clients.Orders;
+using WebStore.Clients.Products;
 using WebStore.Clients.Values;
 using WebStore.DAL.Context;
 using WebStore.Data;
@@ -17,6 +20,7 @@ using WebStore.Infrastructure.Middleware;
 using WebStore.Infrastructure.Services.InCookies;
 using WebStore.Infrastructure.Services.InMemory;
 using WebStore.Infrastructure.Services.InSQL;
+using WebStore.Interfaces.Services;
 using WebStore.Interfaces.TestAPI;
 
 namespace WebStore
@@ -84,11 +88,11 @@ namespace WebStore
                 opt.SlidingExpiration = true;
             });
 
-            services.AddTransient<IEmployeesData, InMemoryEmployeesData>();
+            services.AddTransient<IEmployeesData, EmployeesClient>();
             //services.AddTransient<IProductData, InMemoryProductData>();
-            services.AddTransient<IProductData, SqlProductData>();
+            services.AddTransient<IProductData, ProductsClient>();
             services.AddTransient<ICartService, InCookiesCartService>();
-            services.AddTransient<IOrderService, SqlOrderService>();
+            services.AddTransient<IOrderService, OrdersClient>();
             services.AddTransient<IValuesService, ValuesClient>();
 
             services
