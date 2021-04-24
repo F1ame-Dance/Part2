@@ -1,5 +1,4 @@
 ﻿using System;
-
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -23,6 +22,9 @@ using WebStore.Infrastructure.Services.InMemory;
 using WebStore.Infrastructure.Services.InSQL;
 using WebStore.Interfaces.Services;
 using WebStore.Interfaces.TestAPI;
+using WebStore.Logger;
+using Microsoft.Extensions.Logging;
+
 
 namespace WebStore
 {
@@ -80,9 +82,11 @@ namespace WebStore
                .AddRazorRuntimeCompilation();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory log)
         {
-       
+
+            log.AddLog4Net();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -98,7 +102,7 @@ namespace WebStore
 
             app.UseWelcomePage("/welcome");
 
-            app.UseMiddleware<TestMiddleware>();
+            app.UseMiddleware<ErrorHandlingMiddleware>();
 
             app.MapWhen(
                 context => context.Request.Query.ContainsKey("id") && context.Request.Query["id"] == "5",

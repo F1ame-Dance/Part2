@@ -1,28 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using WebStore.DAL.Context;
 using WebStore.Domain.DTO;
 using WebStore.Domain.Entities.Identity;
 using WebStore.Domain.Entities.Orders;
 using WebStore.Infrastructure.Interfaces;
 using WebStore.Infrastructure.Mapping;
-using WebStore.ViewModels;
 
-namespace WebStore.Infrastructure.Services.InSQL
+
+namespace WebStore.Services.Services.InSQL
 {
     public class SqlOrderService : IOrderService
     {
         private readonly WebStoreDB _db;
         private readonly UserManager<User> _UserManager;
+        private readonly ILogger<SqlOrderService> _Logger;
 
-        public SqlOrderService(WebStoreDB db, UserManager<User> UserManager)
+        public SqlOrderService(
+            WebStoreDB db,
+            UserManager<User> UserManager,
+            ILogger<SqlOrderService> Logger)
         {
             _db = db;
             _UserManager = UserManager;
+            _Logger = Logger;
         }
 
         public async Task<IEnumerable<OrderDTO>> GetUserOrders(string UserName) => (await _db.Orders
@@ -43,6 +50,11 @@ namespace WebStore.Infrastructure.Services.InSQL
             var user = await _UserManager.FindByNameAsync(UserName);
             if (user is null)
                 throw new InvalidOperationException($"Пользователь с именем {UserName} в БД отсутствует");
+
+            _Logger.LogInformation("Оформление нового заказа для {0}",
+                UserName);
+
+            var timer = Stopwatch.StartNew();
 
             await using var transaction = await _db.Database.BeginTransactionAsync();
 
@@ -91,6 +103,9 @@ namespace WebStore.Infrastructure.Services.InSQL
             await _db.SaveChangesAsync();
 
             await transaction.CommitAsync();
+
+            _Logger.LogInformation("Заказа для {0} успешно сформирована за {1} с id:{2} на сумму {3}",
+                UserName, timer.Elapsed, order.Id, order.Items.Sum(i => i.TotalItemPrice));
 
             return order.ToDTO();
         }
