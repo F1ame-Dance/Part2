@@ -14,14 +14,13 @@ namespace WebStore.Components
 
         public IViewComponentResult Invoke() => View(GetBrands());
 
-        private IEnumerable<BrandsViewModel> GetBrands() => 
+        private IEnumerable<BrandsViewModel> GetBrands() =>
             _ProductData.GetBrands()
-               .OrderBy(brand => brand.Order)
-               .Select(brand => new BrandsViewModel
-                {
-                    Id = brand.Id,
-                    Name = brand.Name,
-                    ProductsCount = brand.Products.Count()
-                });
+               .OrderBy(b => b.Order)
+               .Select(b => new BrandsViewModel
+               {
+                   Id = b.Id,
+                   Name = b.Name
+               });
     }
 }

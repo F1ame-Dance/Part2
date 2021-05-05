@@ -1,17 +1,13 @@
-﻿using System;
-using System.Linq;
-
-using Microsoft.AspNetCore.Http;
-
+﻿using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
-
+using System.Linq;
 using WebStore.Domain;
 using WebStore.Domain.Entities;
 using WebStore.Infrastructure.Interfaces;
 using WebStore.Infrastructure.Mapping;
 using WebStore.ViewModels;
 
-namespace WebStore.Infrastructure.Services.InCookies
+namespace WebStore.Services.Services.InCookies
 {
     public class InCookiesCartService : ICartService
     {
@@ -25,6 +21,7 @@ namespace WebStore.Infrastructure.Services.InCookies
             {
                 var context = _HttpContextAccessor.HttpContext;
                 var cookies = context!.Response.Cookies;
+
                 var cart_cookies = context.Request.Cookies[_CartName];
                 if (cart_cookies is null)
                 {
@@ -79,7 +76,7 @@ namespace WebStore.Infrastructure.Services.InCookies
             if (item.Quantity > 0)
                 item.Quantity--;
 
-            if (item.Quantity == 0)
+            if (item.Quantity <= 0)
                 cart.Items.Remove(item);
 
             Cart = cart;
@@ -88,13 +85,9 @@ namespace WebStore.Infrastructure.Services.InCookies
         public void Remove(int id)
         {
             var cart = Cart;
-
             var item = cart.Items.FirstOrDefault(i => i.ProductId == id);
             if (item is null) return;
-
-
             cart.Items.Remove(item);
-
             Cart = cart;
         }
 
@@ -112,13 +105,13 @@ namespace WebStore.Infrastructure.Services.InCookies
                 Ids = Cart.Items.Select(item => item.ProductId).ToArray()
             });
 
-            var product_view_models = products.ToView().ToDictionary(p => p.Id);
+            var products_views = products.FromDTO().ToView().ToDictionary(p => p.Id);
 
             return new CartViewModel
             {
                 Items = Cart.Items
-                   .Where(item => product_view_models.ContainsKey(item.ProductId))
-                   .Select(item => (product_view_models[item.ProductId], item.Quantity))
+                   .Where(item => products_views.ContainsKey(item.ProductId))
+                   .Select(item => (products_views[item.ProductId], item.Quantity))
             };
         }
     }

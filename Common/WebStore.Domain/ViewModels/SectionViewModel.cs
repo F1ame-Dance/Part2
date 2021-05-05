@@ -5,19 +5,15 @@ namespace WebStore.ViewModels
 {
     public record SectionViewModel
     {
-        public int Id { get; init; }
-        
-        public string Name { get; init; }
+        public int Id { get; set; }
 
-        public int Order { get; init; }
-        
-        public SectionViewModel Parent { get; init; }
-        
-        public List<SectionViewModel> ChildSections { get; } = new();
+        public string Name { get; set; }
 
-        public int ProductsCount { get; set; }
+        public int Order { get; set; }
 
-        public int TotalProductsCount => ProductsCount + ChildSections.Sum(c => c.TotalProductsCount);
+        public SectionViewModel Parent { get; set; }
+
+        public List<SectionViewModel> ChildSections { get; set; } = new();
     }
     
 }
