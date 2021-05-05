@@ -56,7 +56,7 @@ namespace WebStore
             services.Configure<IdentityOptions>(opt =>
             {
 #if DEBUG
-                opt.Password.RequiredLength = 3 ;
+                opt.Password.RequiredLength = 3;
                 opt.Password.RequireDigit = false;
                 opt.Password.RequireLowercase = false;
                 opt.Password.RequireUppercase = false;
