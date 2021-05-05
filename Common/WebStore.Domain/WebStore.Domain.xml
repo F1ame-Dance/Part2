@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>WebStore.Domain</name>
+    </assembly>
+    <members>
+        <member name="T:WebStore.Domain.DTO.OrderDTO">
+            <summary>
+            Инфо о заказе
+            </summary>
+        </member>
+        <member name="P:WebStore.Domain.DTO.OrderDTO.Date">
+            <summary>
+            Дата заказа
+            </summary>
+        </member>
+        <member name="T:WebStore.Domain.DTO.OrderItemDTO">
+            <summary>
+            Пункт заказа
+            </summary>
+        </member>
+        <member name="T:WebStore.Domain.DTO.CreateOrderModel">
+            <summary>
+            Модель процесса создания заказа
+            </summary>
+        </member>
+    </members>
+</doc>
