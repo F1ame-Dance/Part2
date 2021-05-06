@@ -11,16 +11,16 @@ using WebStore.ViewModels;
 namespace WebStore.Controllers
 {
     [Authorize]
-    public class AccountController : Controller
+    public class SiteMap : Controller
     {
         private readonly UserManager<User> _UserManager;
         private readonly SignInManager<User> _SignInManager;
-        private readonly ILogger<AccountController> _Logger;
+        private readonly ILogger<SiteMap> _Logger;
 
-        public AccountController(
+        public SiteMap(
             UserManager<User> UserManager,
             SignInManager<User> SignInManager,
-            ILogger<AccountController> Logger)
+            ILogger<SiteMap> Logger)
         {
             _UserManager = UserManager;
             _SignInManager = SignInManager;
