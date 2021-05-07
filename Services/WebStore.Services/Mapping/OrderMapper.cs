@@ -16,6 +16,7 @@ namespace WebStore.Infrastructure.Mapping
                 Id = Item.Id,
                 Price = Item.Price,
                 Quantity = Item.Quantity,
+                ProductId = Item.Product?.Id ?? 0
             };
 
         public static OrderItem FromDTO(this OrderItemDTO Item) => Item is null
@@ -25,6 +26,7 @@ namespace WebStore.Infrastructure.Mapping
                 Id = Item.Id,
                 Price = Item.Price,
                 Quantity = Item.Quantity,
+                Product = new Product { Id = Item.ProductId },
             };
 
         public static OrderDTO ToDTO(this Order Order) => Order is null
