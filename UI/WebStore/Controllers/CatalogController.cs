@@ -1,27 +1,42 @@
 ﻿using System.Linq;
+using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Mvc;
 using WebStore.Domain;
 using WebStore.Infrastructure.Interfaces;
 using WebStore.Infrastructure.Mapping;
 using WebStore.ViewModels;
+using System.Collections.Generic;
 
 namespace WebStore.Controllers
 {
     public class CatalogController : Controller
     {
         private readonly IProductData _ProductData;
+        private readonly IConfiguration _Configuration;
+        private const string __CatalogPageSize = "CatalogPageSize";
 
-        public CatalogController(IProductData ProductData) => _ProductData = ProductData;
 
-        public IActionResult Index(int? BrandId, int? SectionId)
+        public CatalogController(IProductData ProductData, IConfiguration Configuration)
         {
+            _ProductData = ProductData;
+            _Configuration = Configuration;
+        }
+
+        public IActionResult Index(int? BrandId, int? SectionId, int Page = 1, int? PageSize = null)
+        {
+            var page_size = PageSize
+                ?? (int.TryParse(_Configuration[__CatalogPageSize], out var value) ? value : null);
+
             var filter = new ProductFilter
             {
                 BrandId = BrandId,
                 SectionId = SectionId,
+                Page = Page,
+                PageSize = page_size
             };
 
-            var products = _ProductData.GetProducts(filter);
+  
+            var (products, total_count) = _ProductData.GetProducts(filter);
 
             return View(new CatalogViewModel
             {
@@ -30,7 +45,13 @@ namespace WebStore.Controllers
                 Products = products
                    .OrderBy(p => p.Order)
                    .FromDTO()
-                   .ToView()
+                   .ToView(),
+                PageViewModel = new PageViewModel
+                {
+                    Page = Page,
+                    PageSize = page_size ?? 0,
+                    TotalItems = total_count
+                }
             });
         }
 
@@ -38,8 +59,26 @@ namespace WebStore.Controllers
         {
             var product = _ProductData.GetProductById(id);
             if (product is null) return NotFound();
-
             return View(product.FromDTO().ToView());
         }
+
+        #region WebAPI
+
+        public IActionResult GetFeaturesItems(int? BrandId, int? SectionId, int Page = 1, int? PageSize = null) =>
+            PartialView("Partial/_FeaturesItems", GetProducts(BrandId, SectionId, Page, PageSize));
+
+        private IEnumerable<ProductViewModel> GetProducts(int? BrandId, int? SectionId, int Page, int? PageSize) =>
+            _ProductData.GetProducts(new ProductFilter
+            {
+                SectionId = SectionId,
+                BrandId = BrandId,
+                Page = Page,
+                PageSize = PageSize ?? (int.TryParse(_Configuration[__CatalogPageSize], out var size) ? size : null)
+            })
+               .Products.OrderBy(p => p.Order)
+               .FromDTO()
+               .ToView();
+
+        #endregion
     }
 }

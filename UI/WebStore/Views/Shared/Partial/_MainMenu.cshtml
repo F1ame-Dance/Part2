@@ -1,24 +1,38 @@
 ﻿<ul class="nav navbar-nav collapse navbar-collapse">
-    <li><a asp-controller="Home" asp-action="Index" class="active">Главная</a></li>
+    <li><a href="#" class="active">Home</a></li>
     <li class="dropdown">
-        <a href="#">Магазин<i class="fa fa-angle-down"></i></a>
+        <a is-active-route ignore-action asp-controller="Catalog" asp-action="Index">Магазин<i class="fa fa-angle-down"></i></a>
         <ul role="menu" class="sub-menu">
-            <li><a asp-controller="Catalog" asp-action="Index">Каталог</a></li>
-            <li><a href="product-details.html">О товаре</a></li>
-            <li><a href="checkout.html">Оформить заказ</a></li>
-            <li><a href="cart.html">Корзина</a></li>
-            <li><a href="login.html">Вход</a></li>
+            <li><a is-active-route asp-controller="Catalog" asp-action="Index">Каталог</a></li>
         </ul>
     </li>
     <li class="dropdown">
         <a href="#">Блог<i class="fa fa-angle-down"></i></a>
         <ul role="menu" class="sub-menu">
-            <li><a href="blog.html">Список блогов</a></li>
-            <li><a href="blog-single.html">Блог магазина</a></li>
+            <li><a href="#">Список блогов</a></li>
+            <li><a href="#">Блог магазина</a></li>
         </ul>
     </li>
-    <li><a href="404.html">404</a></li>
-    <li><a href="contact-us.html">Контакты</a></li>
-    <li><a asp-controller="Employees" asp-action="Index">Сотрудники</a></li>
-    <li><a asp-controller="WebAPI" asp-action="Index">WebAPI</a></li>
+    <li><a href="#">404</a></li>
+    <li><a href="#">Контакты</a></li>
+    <li><a is-active-route asp-controller="Employees" asp-action="Index">Сотрудники</a></li>
+    <li class="dropdown">
+        <a href="#">Тесты<i class="fa fa-angle-down"></i></a>
+        <ul role="menu" class="sub-menu">
+            <li><a asp-controller="WebAPI" asp-action="Index" class="@IsActive("WebAPI")">WebAPI</a></li>
+            <li><a is-active-route asp-controller="AjaxTest" asp-action="Index">AJAX</a></li>
+            <li><a is-active-route asp-controller="AjaxTest" asp-action="SignalRTest">SignalR</a></li>
+        </ul>
+    </li>
+    <li><a data-ajax="true" data-ajax-url="@Url.Action("Clear", "Console")" href="#">Clear</a></li>
+    <li><a data-ajax="true" data-ajax-url="@Url.Action("WriteLine", "Console", new { Message = "Hello World!" })" href="#">WL</a></li>
 </ul>
+
+@functions
+{
+    string IsActive(string Controller, string Action = "Index") =>
+        Equals(Controller, ViewContext.RouteData.Values["Controller"])
+            && Equals(Action, ViewContext.RouteData.Values["Action"])
+            ? "active"
+            : null;
+}
