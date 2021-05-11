@@ -33,6 +33,13 @@ namespace WebStore.Controllers
         public IActionResult Register() => View(new RegisterUserViewModel());
 
         [AllowAnonymous]
+        public async Task<IActionResult> InNameFree(string UserName)
+        {
+            var user = await _UserManager.FindByNameAsync(UserName);
+            return Json(user is null ? "true" : "Пользователь с таким именем уже существует");
+        }
+
+        [AllowAnonymous]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterUserViewModel Model)
         {
